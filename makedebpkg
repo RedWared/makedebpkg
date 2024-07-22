@@ -1,0 +1,37 @@
+#! /bin/bash
+
+if [ "$(echo $0 | cut -c 1)" == "." ]; then
+	funcspaths="funcs"
+else
+	funcspaths="/usr/share/makedebpkg"
+fi
+
+for file in $(ls $funcspaths); do
+	source $funcspaths/$file
+done
+
+depends=()
+section=""
+pkgpriority=""
+
+if [ "$#" -eq 0 ]; then
+	# DEBBUILD check
+	debCheck
+	source DEBBUILD
+
+	# Checks
+	compCheck		# Checking if .deb are alrready build.
+
+	wah
+	exit 0
+else
+	cmds=("-h" "--help" "-V" "--version" "-f" "--force" "-i" "--install")
+	for arg in "${cmds[@]}"; do
+		if [ "$1" == "$arg" ]; then
+			$1
+			exit 0
+		fi
+	done
+fi
+
+echo "makedebpkg: la opción no es válida '$1'"
